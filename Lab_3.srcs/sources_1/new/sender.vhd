@@ -1,14 +1,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 entity sender is
     Port( signal btn, clk, en, rdy, rst :  in std_logic;
@@ -29,16 +21,17 @@ begin
 process(clk)
 begin
     if(rising_edge(clk)) then
-        if en = '1' then
-            if rst = '1' then
-                char <= (others => '0');
-                i <= (others => '0');
-                send <= '0';
-            end if;
+        if rst = '1' then
+              char <= (others => '0');
+              i <= (others => '0');
+              send <= '0';
+              curr <= idle;
+        elsif en = '1' then
             case curr is
                 when idle =>
                     if rdy = '1' and btn = '1' and unsigned(i) < 6 then
                         char <= netid(to_integer(unsigned(i)));
+                        i <= std_logic_vector(unsigned(i)+1);
                         curr <= busyA;
                     elsif rdy = '1' and btn = '1' and unsigned(i) = 6 then
                         i <= (others => '0');
